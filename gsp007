@@ -1,0 +1,50 @@
+This script sets up a basic web server infrastructure on Google Cloud Platform (GCP) using Compute Engine instances, load balancers, and firewall rules. Here's a breakdown of the script:
+
+1. **Set Region and Zone Variables**:
+   - The script exports the `REGION` variable from the `ZONE` variable.
+   - `gcloud config` commands are used to set the compute region and zone.
+
+2. **Create Compute Engine Instances (www1, www2, www3)**:
+   - Three instances are created with Debian 11 as the base image.
+   - Apache2 is installed, and a basic HTML page is created for each instance.
+   - Instances are tagged with `network-lb-tag`.
+
+3. **Create Firewall Rules**:
+   - A firewall rule named `www-firewall-network-lb` is created to allow traffic on port 80.
+
+4. **Create a Static IP Address**:
+   - An external IP address (`network-lb-ip-1`) is reserved for the load balancer.
+
+5. **Create HTTP Health Check**:
+   - A basic HTTP health check named `basic-check` is created.
+
+6. **Create Target Pools**:
+   - A target pool named `www-pool` is created, and instances `www1`, `www2`, and `www3` are added to it.
+
+7. **Create Forwarding Rules**:
+   - A forwarding rule named `www-rule` is created to route traffic to the target pool.
+   - The external IP address of the forwarding rule is obtained and stored in the `IPADDRESS` variable.
+
+8. **Create Instance Templates and Managed Instance Group**:
+   - An instance template (`lb-backend-template`) is created with Apache2 installed and configured.
+   - A managed instance group (`lb-backend-group`) is created with the instance template.
+
+9. **Create Firewall Rules for Health Checks**:
+   - A firewall rule named `fw-allow-health-check` is created to allow health check traffic.
+
+10. **Create Global IP Address for Load Balancer**:
+    - A global IP address (`lb-ipv4-1`) is created for the load balancer.
+
+11. **Create Health Check for Load Balancer Backend Service**:
+    - An HTTP health check named `http-basic-check` is created for the load balancer backend service.
+
+12. **Create Backend Service and URL Map**:
+    - A backend service (`web-backend-service`) is created with HTTP as the protocol, using the previously created health check.
+    - The managed instance group is added as a backend to the backend service.
+    - A URL map (`web-map-http`) is created with the backend service as the default service.
+
+13. **Create Target HTTP Proxy and Forwarding Rule for Load Balancer**:
+    - A target HTTP proxy (`http-lb-proxy`) is created with the URL map.
+    - A forwarding rule (`http-content-rule`) is created to route incoming HTTP traffic to the target HTTP proxy.
+
+This setup creates a load-balanced web server infrastructure with three backend instances (`www1`, `www2`, `www3`) serving traffic through a global HTTP(S) load balancer.
